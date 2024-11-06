@@ -1,55 +1,136 @@
 package com.example.livrariagerencia.controller;
 
 import com.example.livrariagerencia.model.Livro;
+import com.example.livrariagerencia.repository.AutorRepository;
 import com.example.livrariagerencia.repository.LivroRepository;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
-@Transactional
 @RequestMapping("livro")
 public class LivroController {
 
     @Autowired
-    private LivroRepository repository;
+    private LivroRepository livroRepository;
+
+    @Autowired
+    private AutorRepository autorRepository;
 
     @GetMapping("/form")
-    public ModelAndView form(Livro livro, ModelMap model) {
-        model.addAttribute("livro", livro);
-        return new ModelAndView("livro/form");
+    public String form(Model model) {
+        if (!model.containsAttribute("livro")) {
+            model.addAttribute("livro", new Livro());
+        }
+        model.addAttribute("autores", autorRepository.findAll());
+        return "livro/form";
     }
 
-    @GetMapping("/list")
-    public ModelAndView list(ModelMap model) {
-        model.addAttribute("livros", repository.findAll());
-        return new ModelAndView("livro/list", model);
+    @GetMapping
+    public String list(Model model) {
+        model.addAttribute("livros", livroRepository.findAll());
+        return "livro/list";
     }
 
     @PostMapping("/save")
-    public ModelAndView save(@ModelAttribute("livro") Livro livro) {
-        repository.save(livro);
-        return new ModelAndView("redirect:/livro/list");
+    public String save(@Valid @ModelAttribute("livro") Livro livro,
+                       BindingResult result,
+                       RedirectAttributes redirectAttributes,
+                       Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("autores", autorRepository.findAll());
+            return "livro/form";
+        }
+
+        try {
+            livroRepository.save(livro);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Livro salvo com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao salvar o livro: " + e.getMessage());
+        }
+
+        return "redirect:/livro";
     }
 
     @GetMapping("/edit/{id}")
-    public ModelAndView edit(@PathVariable("id") Long id, ModelMap model) {
-        model.addAttribute("livro", repository.findById(id));
-        return new ModelAndView("livro/form_edit", model);
+    public String edit(@PathVariable("id") Long id,
+                       Model model,
+                       RedirectAttributes redirectAttributes) {
+        Optional<Livro> livro = livroRepository.findById(id);
+
+        if (livro.isPresent()) {
+            model.addAttribute("livro", livro.get());
+            model.addAttribute("autores", autorRepository.findAll());
+            return "livro/form";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Livro não encontrado.");
+            return "redirect:/livro";
+        }
     }
 
     @PostMapping("/update")
-    public ModelAndView update(@ModelAttribute("livro") Livro livro) {
-        repository.save(livro);
-        return new ModelAndView("redirect:/livro/list");
+    public String update(@Valid @ModelAttribute("livro") Livro livro,
+                         BindingResult result,
+                         RedirectAttributes redirectAttributes,
+                         Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("autores", autorRepository.findAll());
+            return "livro/form";
+        }
+
+        try {
+            if (!livroRepository.existsById(livro.getId())) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Livro não encontrado para atualização.");
+                return "redirect:/livro";
+            }
+
+            livroRepository.save(livro);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Livro atualizado com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao atualizar o livro: " + e.getMessage());
+        }
+
+        return "redirect:/livro";
     }
 
     @GetMapping("/remove/{id}")
-    public ModelAndView remove(@PathVariable("id") Long id) {
-        repository.deleteById(id);
-        return new ModelAndView("redirect:/livro/list");
+    public String remove(@PathVariable("id") Long id,
+                         RedirectAttributes redirectAttributes) {
+        try {
+            if (!livroRepository.existsById(id)) {
+                redirectAttributes.addFlashAttribute("errorMessage",
+                        "Livro não encontrado para remoção.");
+                return "redirect:/livro";
+            }
+
+            livroRepository.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Livro removido com sucesso!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Erro ao remover o livro: " + e.getMessage());
+        }
+
+        return "redirect:/livro";
+    }
+
+    @ExceptionHandler(Exception.class)
+    public String handleError(Exception ex,
+                              RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage",
+                "Ocorreu um erro: " + ex.getMessage());
+        return "redirect:/livro";
     }
 }

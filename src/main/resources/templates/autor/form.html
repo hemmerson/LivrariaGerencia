@@ -9,11 +9,11 @@
 <body>
 <main>
     <div class="container h-custom">
-        <h1 >Cadastro de Autor</h1>
+        <h1>Cadastro de Autor</h1>
         <hr>
         <div class="row d-flex justify-content-center align-items-center h-100 mb-5">
             <form class="row g-3 needs-validation" novalidate
-                  th:action="@{/autor/save}"
+                  th:action="${autor.id == null ? '/autor/save' : '/autor/update'}"
                   th:object="${autor}" method="post">
 
                 <input class="form-control" type="hidden" th:field="*{id}">
@@ -35,15 +35,15 @@
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('sobrenome')}" th:errors="*{sobrenome}"></div>
                     </div>
                 </div>
-
                 <hr/>
 
-                <button type="submit" class="btn btn-outline-primary btn-lg">Enviar</button>
-                <a th:href="|/autor|" class="btn btn-secondary btn-lg">Lista</a>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-outline-primary btn-lg">Salvar</button>
+                    <a th:href="@{/autor}" class="btn btn-secondary btn-lg">Voltar</a>
+                </div>
             </form>
         </div>
     </div>
-
 </main>
 </body>
 </html>

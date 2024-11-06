@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head th:replace="~{fragments/head :: head(~{::title}, ~{})}">
+    <title>Lista de Livros</title>
+</head>
+
+<body>
+<main>
+    <div class="container">
+        <h1>Lista de Livros</h1>
+        <hr>
+        <a class="btn btn-outline-dark" th:href="@{livro/form}">Novo</a>
+        <div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Titulo</th>
+                    <th>Editora</th>
+                    <th>Ano Lançamento</th>
+                    <th>Número de páginas</th>
+                    <th>Autores</th>
+                    <th colspan="2">#Links</th>
+                </tr>
+                </thead>
+                <tr th:each="l : ${livros}">
+
+                    <td th:text="${l.id}"></td>
+                    <td th:text="${l.titulo}"></td>
+                    <td th:text="${l.editora}"></td>
+                    <td th:text="${l.ano}"></td>
+                    <td th:text="${l.paginas}"></td>
+                    <td th:text="${l.autores}"></td>
+                    <td>
+                        <a class="btn btn-outline-secondary" th:href="@{/livro/edit/{id} (id=${l.id})}">Editar</a>
+                    </td>
+                    <td>
+                        <a onclick="return window.confirm('Tem certeza que deseja excluir este registro?')"
+                           class="btn btn-outline-danger" th:href="@{/livro/remove/{id}(id=${l.id})}">Excluir</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,10 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}">
+
+<head th:replace="~{fragments/head :: head(~{::title},~{})}">
+    <title>Cadastro de Livro</title>
+</head>
+
+<body>
+<main>
+    <div class="container h-custom">
+        <h1>Cadastro de Livro</h1>
+        <hr>
+        <div class="row d-flex justify-content-center align-items-center h-100 mb-5">
+            <form class="row g-3 needs-validation" novalidate
+                  th:action="${livro.id == null ? '/livro/save' : '/livro/update'}"
+                  th:object="${livro}" method="post">
+
+                <input class="form-control" type="hidden" th:field="*{id}">
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="titulo" type="text" th:field="*{titulo}" placeholder="Título"
+                               th:errorclass="is-invalid" required>
+                        <label for="titulo">Título</label>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="editora" type="text" th:field="*{editora}" placeholder="Editora"
+                               th:errorclass="is-invalid" required>
+                        <label for="editora">Editora</label>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('editora')}" th:errors="*{editora}"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="ano" type="number" th:field="*{ano}" placeholder="Ano"
+                               min="1500" max="2024" th:errorclass="is-invalid" required>
+                        <label for="ano">Ano</label>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('ano')}" th:errors="*{ano}"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input class="form-control" id="paginas" type="number" th:field="*{paginas}" placeholder="Páginas"
+                               min="1" th:errorclass="is-invalid" required>
+                        <label for="paginas">Número de Páginas</label>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('paginas')}" th:errors="*{paginas}"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <select class="form-select" id="autores" th:field="*{autores}" multiple
+                                th:errorclass="is-invalid" required style="height: 100px;">
+                            <option th:each="autor : ${autores}"
+                                    th:value="${autor.id}"
+                                    th:text="${autor.nome + ' ' + autor.sobrenome}">Nome do Autor</option>
+                        </select>
+                        <label for="autores">Autores</label>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('autores')}" th:errors="*{autores}"></div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="active" th:field="*{active}">
+                        <label class="form-check-label" for="active">Ativo</label>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-outline-primary btn-lg">Salvar</button>
+                    <a th:href="@{/livro}" class="btn btn-secondary btn-lg">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
 </body>
 </html>
