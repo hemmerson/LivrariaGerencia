@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html th:replace="~{fragments/layout :: layout(~{::head},~{::main})}" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head th:replace="~{fragments/head :: head(~{::title}, ~{})}">
+    <title>Lista de Autores</title>
+</head>
+
+<body>
+<main>
+    <div class="container">
+        <h1>Lista de Autores</h1>
+        <hr>
+        <a class="btn btn-outline-dark" th:href="@{autor/form}">Novo</a>
+        <div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Sobrenome</th>
+                    <th colspan="2">#Links</th>
+                </tr>
+                </thead>
+                <tr th:each="a : ${autores}">
+
+                    <td th:text="${a.id}"></td>
+                    <td th:text="${a.nome}"></td>
+                    <td th:text="${a.sobrenome}"></td>
+                    <td>
+                        <a class="btn btn-outline-secondary" th:href="@{/autor/edit/{id} (id=${a.id})}">Editar</a>
+                    </td>
+                    <td>
+                        <a onclick="return window.confirm('Tem certeza que deseja excluir este registro?')"
+                           class="btn btn-outline-danger" th:href="@{/autor/remove/{id}(id=${a.id})}">Excluir</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>
