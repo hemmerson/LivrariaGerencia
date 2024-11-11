@@ -55,16 +55,14 @@
                 </div>
 
                 <div class="col-md-12">
-                    <div class="form-floating">
-                        <select class="form-select" id="autores" th:field="*{autores}" multiple
-                                th:errorclass="is-invalid" required style="height: 100px;">
+                    <label for="autores">Autores</label>
+                    <select id="autores" th:field="*{autores}" multiple
+                                th:errorclass="is-invalid" required style="min-height: 50px;">
                             <option th:each="autor : ${autores}"
                                     th:value="${autor.id}"
                                     th:text="${autor.nome + ' ' + autor.sobrenome}">Nome do Autor</option>
                         </select>
-                        <label for="autores">Autores</label>
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('autores')}" th:errors="*{autores}"></div>
-                    </div>
                 </div>
 
                 <div class="col-md-12">
@@ -84,5 +82,7 @@
         </div>
     </div>
 </main>
+
+
 </body>
 </html>
